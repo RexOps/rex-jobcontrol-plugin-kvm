@@ -30,7 +30,7 @@ has kvm_id => ( is => 'ro' );
 sub create {
   my ($self) = @_;
   $self->project->app->log->debug(
-    "Creating a docker container from image: " . $self->image );
+    "Creating a KVM host from image: " . $self->image );
 
   my $host_node = Rex::JobControl::Helper::Project::Node->new(
     node_id => $self->host,
