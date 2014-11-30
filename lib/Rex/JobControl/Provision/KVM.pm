@@ -22,9 +22,9 @@ with 'Rex::JobControl::Provision::Base', 'Rex::JobControl::Plugin';
 
 Rex::JobControl::Provision->register_type('kvm');
 
-has image     => ( is => 'ro' );
-has host      => ( is => 'ro' );
-has name      => ( is => 'ro' );
+has image  => ( is => 'ro' );
+has host   => ( is => 'ro' );
+has name   => ( is => 'ro' );
 has kvm_id => ( is => 'ro' );
 
 sub create {
@@ -45,13 +45,17 @@ sub create {
   Rex::Commands::set( virtualization => 'LibVirt' );
 
   vm clone => $self->image, $self->name;
-  if($? != 0) {
-    $self->project->app->log->error("Error cloning VM. virt clone returned non zero value.");
+  if ( $? != 0 ) {
+    $self->project->app->log->error(
+      "Error cloning VM. virt clone returned non zero value.");
     die "Error cloning VM.";
   }
 
   my $vm_info = vm info => $self->name;
-  return { kvm_id => $vm_info->{uuid} };
+
+  vm start => $vm_info->{UUID};
+
+  return { kvm_id => $vm_info->{UUID} };
 }
 
 sub remove {
@@ -86,6 +90,9 @@ sub get_data {
     project => $self->project
   );
 
+  $self->project->app->log->debug(
+    "Trying to get guestinfo from " . $self->kvm_id );
+
   my $auth = $self->get_auth_data($host_node);
   $self->project->app->ssh_pool->connect_to(
     ( $host_node->data->{ip} || $host_node->name ),
@@ -93,7 +100,7 @@ sub get_data {
 
   Rex::Commands::set( virtualization => 'LibVirt' );
 
-  return vm info => $self->kvm_id;
+  return vm guestinfo => $self->kvm_id;
 }
 
 sub get_hosts {
