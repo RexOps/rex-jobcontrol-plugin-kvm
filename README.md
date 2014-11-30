@@ -1,7 +1,7 @@
 # KVM Plugin for Rex JobControl
 
 
-This is a docker plugin for Rex JobControl to provision KVM vms.
+This is a KVM plugin for Rex JobControl to provision KVM vms.
 
 
 ## INSTALLATION
